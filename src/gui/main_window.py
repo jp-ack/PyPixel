@@ -24,6 +24,11 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.pixelate_button)
         self.pixelate_button.clicked.connect(self.pixelate_image)
 
+        self.export_button = QPushButton("Export Image", self)
+        self.layout.addWidget(self.export_button)
+        self.export_button.clicked.connect(self.export_image)
+
+
         self.image_label = QLabel(self)
         self.layout.addWidget(self.image_label)
 
@@ -31,23 +36,37 @@ class MainWindow(QMainWindow):
 
     def load_image(self):
         options = QFileDialog.Options()
-        # Set initial directory to 'src' folder (or another folder you want)
-        initial_directory = "C:/Users/jp/PixelApp/src"  # Adjust to your folder path
-        file, _ = QFileDialog.getOpenFileName(self, "Open Image", initial_directory, "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
+        file, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Images (*.png *.jpg *.bmp);;All Files (*)", options=options)
         if file:
             self.pixmap = QPixmap(file)
+
+            # Resize the image to fit within the window size or custom size (e.g., 500x500)
+            self.pixmap = self.pixmap.scaled(500, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+            # Set the image to the label
             self.image_label.setPixmap(self.pixmap)
             self.image_label.setAlignment(Qt.AlignCenter)
 
 
     def pixelate_image(self):
         if self.pixmap:
+            # Convert QPixmap to QImage to work with pixel data
             image = self.pixmap.toImage()
 
-            # Call the pixelate_image function from the core module
-            pixelated_image = pixelate_image(image, pixel_size=20)
+            # Call the pixelate_image function directly
+            pixelated_image = pixelate_image(image, pixel_size=8)
 
-            # Convert back to QPixmap and display
-            self.pixmap = QPixmap.fromImage(pixelated_image)
+            # Resize the pixelated image to fit within the same size
+            self.pixmap = QPixmap.fromImage(pixelated_image).scaled(500, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+            # Set the processed image to the label
             self.image_label.setPixmap(self.pixmap)
             self.image_label.setAlignment(Qt.AlignCenter)
+
+    def export_image(self):
+        if self.pixmap:
+            options = QFileDialog.Options()
+            file, _ = QFileDialog.getSaveFileName(self,"Save Image", "" ,"Images(*.png *.jpg *.bmp);;All Files (*)",options = options)
+            
+            if file:
+                self.pixmap.save(file)
