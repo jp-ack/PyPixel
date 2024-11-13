@@ -28,3 +28,7 @@
    ```bash
    git clone https://github.com/yourusername/PixelApp.git
    cd PixelApp
+   
+## To Run
+   ```bash
+   python src/main.py
